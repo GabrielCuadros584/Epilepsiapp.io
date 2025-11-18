@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpilepsiApp</title>
+    <meta name="description" content="Aplicación móvil para ayudar a personas con epilepsia">
+    <meta name="theme-color" content="#4a6fa5">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚕️</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EpilepsiApp">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234a6fa5' rx='20'/><text x='50' y='70' font-family='Arial' font-size='60' text-anchor='middle' fill='white'>⚕️</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Variables de colores y estilos */
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b9ac4;
+            --accent-color: #e63946;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header y navegación */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Botón de emergencia */
+        .emergency-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(230, 57, 70, 0.4);
+            transition: var(--transition);
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .emergency-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(230, 57, 70, 0.6);
+        }
+
+        .emergency-btn.small {
+            width: 50px;
+            height: 50px;
+            font-size: 10px;
+            bottom: 15px;
+            right: 15px;
+        }
+
+        .emergency-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .emergency-btn.small .emergency-icon {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        /* Secciones principales */
+        .main-content {
+            padding: 20px 0;
+            min-height: calc(100vh - 140px);
+        }
+
+        .section {
+            display: none;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Dashboard - Optimizado */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            text-align: center;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .dashboard-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .dashboard-card .icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .dashboard-card p {
+            font-size: 0.8rem;
+            color: #666;
+            display: none;
+        }
+
+        .emergency-card {
+            background-color: #ffe6e6;
+            border: 2px solid var(--accent-color);
+            grid-column: span 2;
+            height: 140px;
+        }
+
+        .emergency-card .icon {
+            color: var(--accent-color);
+            font-size: 36px;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        /* Listas y tablas */
+        .list-item {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .list-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Gráficos */
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .report-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .report-option {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .report-option:hover {
+            background-color: #e9ecef;
+        }
+
+        .report-option i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Contactos */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .contact-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-card h3 i {
+            color: var(--secondary-color);
+        }
+
+        .contact-info {
+            margin-bottom: 15px;
+        }
+
+        .contact-info p {
+            margin-bottom: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+
+        /* Modal de emergencia */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        .modal h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .emergency-card {
+                grid-column: span 1;
+            }
+            
+            .emergency-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 12px;
+            }
+            
+            .dashboard-card {
+                height: 110px;
+                padding: 12px;
+            }
+            
+            .dashboard-card h3 {
+                font-size: 0.9rem;
+            }
+            
+            .dashboard-card .icon {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .emergency-card {
+                grid-column: span 2;
+            }
+        }
+
+        /* Estilos PWA adicionales */
+        .install-prompt {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border: 2px solid var(--primary-color);
+            max-width: 300px;
+            display: none;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--warning-color);
+            color: var(--dark-color);
+            text-align: center;
+            padding: 5px;
+            font-size: 0.8rem;
+            z-index: 1001;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Indicador offline -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi"></i> Estás trabajando sin conexión
+    </div>
+
+    <!-- Header con navegación -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <!-- Logo de la app - Cerebrito -->
+                    <svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.5 8C16.5 8 11 11.5 11 16.5C11 19.5 13.5 22.5 17 23.5C18 26.5 20.5 28.5 22.5 28.5C24.5 28.5 27 26.5 28 23.5C31.5 22.5 34 19.5 34 16.5C34 11.5 28.5 8 22.5 8Z" fill="#4a6fa5" stroke="#3a5a85" stroke-width="1.5"/>
+                        <path d="M28 25C30.5 25 32.5 27 32.5 29.5C32.5 32 30.5 34 28 34C25.5 34 23.5 32 23.5 29.5C23.5 27 25.5 25 28 25Z" fill="#6b9ac4" stroke="#5a8ab4" stroke-width="1.2"/>
+                        <path d="M17 25C14.5 25 12.5 27 12.5 29.5C12.5 32 14.5 34 17 34C19.5 34 21.5 32 21.5 29.5C21.5 27 19.5 25 17 25Z" fill="#6b9ac4" stroke="#5a8ab4" stroke-width="1.2"/>
+                        <path d="M18 13C19 13 20 14 20 15C20 16 19 17 18 17C17 17 16 16 16 15C16 14 17 13 18 13Z" fill="#8bb5d9"/>
+                        <path d="M25 13C26 13 27 14 27 15C27 16 26 17 25 17C24 17 23 16 23 15C23 14 24 13 25 13Z" fill="#8bb5d9"/>
+                        <path d="M20 19C21 19 22 20 22 21C22 22 21 23 20 23C19 23 18 22 18 21C18 20 19 19 20 19Z" fill="#8bb5d9"/>
+                        <path d="M16 20C17 20 18 21 18 22C18 23 17 24 16 24C15 24 14 23 14 22C14 21 15 20 16 20Z" fill="#8bb5d9"/>
+                        <path d="M27 20C28 20 29 21 29 22C29 23 28 24 27 24C26 24 25 23 25 22C25 21 26 20 27 20Z" fill="#8bb5d9"/>
+                        <path d="M28 30.5C28.5523 30.5 29 30.0523 29 29.5C29 28.9477 28.5523 28.5 28 28.5C27.4477 28.5 27 28.9477 27 29.5C27 30.0523 27.4477 30.5 28 30.5Z" fill="white"/>
+                        <path d="M17 30.5C17.5523 30.5 18 30.0523 18 29.5C18 28.9477 17.5523 28.5 17 28.5C16.4477 28.5 16 28.9477 16 29.5C16 30.0523 16.4477 30.5 17 30.5Z" fill="white"/>
+                    </svg>
+                    <h1>EpilepsiApp</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="dashboard">Inicio</a></li>
+                        <li><a href="#" class="nav-link" data-section="crisis">Registrar Crisis</a></li>
+                        <li><a href="#" class="nav-link" data-section="medication">Medicación</a></li>
+                        <li><a href="#" class="nav-link" data-section="history">Historial</a></li>
+                        <li><a href="#" class="nav-link" data-section="statistics">Estadísticas</a></li>
+                        <li><a href="#" class="nav-link" data-section="contacts">Contactos</a></li>
+                        <li><a href="#" class="nav-link" data-section="profile">Perfil</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard -->
+            <section id="dashboard" class="section active">
+                <h2>Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card emergency-card" id="dashboard-emergency">
+                        <div class="icon">🚨</div>
+                        <h3>BOTÓN DE EMERGENCIA</h3>
+                        <p>Presiona para enviar alerta con tu ubicación a contactos de emergencia</p>
+                    </div>
+                    <div class="dashboard-card" data-section="crisis">
+                        <div class="icon"><i class="fas fa-file-medical"></i></div>
+                        <h3>Registrar Crisis</h3>
+                    </div>
+                    <div class="dashboard-card" data-section="medication">
+                        <div class="icon"><i class="fas fa-pills"></i></div>
+                        <h3>Medicación</h3>
+                    </div>
+                    <div class="dashboard-card" data-section="history">
+                        <div class="icon"><i class="fas fa-history"></i></div>
+                        <h3>Historial</h3>
+                    </div>
+                    <div class="dashboard-card" data-section="statistics">
+                        <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                        <h3>Estadísticas</h3>
+                    </div>
+                    <div class="dashboard-card" data-section="contacts">
+                        <div class="icon"><i class="fas fa-address-book"></i></div>
+                        <h3>Contactos</h3>
+                    </div>
+                </div>
+                
+                <h3>Acciones Rápidas</h3>
+                <div class="quick-actions">
+                    <button class="btn" data-section="medication">Agregar Medicamento</button>
+                    <button class="btn btn-success" id="generate-report">Generar Reporte</button>
+                </div>
+            </section>
+
+            <!-- Registrar Crisis -->
+            <section id="crisis" class="section">
+                <h2>Registrar Crisis</h2>
+                <form id="crisis-form">
+                    <div class="form-group">
+                        <label for="crisis-type">Tipo de Crisis</label>
+                        <select id="crisis-type" class="form-control" required>
+                            <option value="">Selecciona un tipo</option>
+                            <option value="focal">Crisis Focal</option>
+                            <option value="generalizada">Crisis Generalizada</option>
+                            <option value="ausencia">Crisis de Ausencia</option>
+                            <option value="tonico-clonica">Crisis Tónico-Clónica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="crisis-duration">Duración (minutos)</label>
+                        <input type="number" id="crisis-duration" class="form-control" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="crisis-symptoms">Síntomas</label>
+                        <textarea id="crisis-symptoms" class="form-control" rows="4" placeholder="Describe los síntomas experimentados"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="crisis-triggers">Posibles Desencadenantes</label>
+                        <input type="text" id="crisis-triggers" class="form-control" placeholder="Estrés, falta de sueño, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label for="crisis-date">Fecha y Hora</label>
+                        <input type="datetime-local" id="crisis-date" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn">Guardar Registro</button>
+                </form>
+            </section>
+
+            <!-- Gestión de Medicación -->
+            <section id="medication" class="section">
+                <h2>Gestión de Medicación</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn" id="add-medication-btn">Agregar Medicamento</button>
+                </div>
+                
+                <h3>Medicamentos Activos</h3>
+                <div id="medication-list">
+                    <!-- Los medicamentos se cargarán dinámicamente aquí -->
+                </div>
+                
+                <!-- Formulario para agregar medicamento (inicialmente oculto) -->
+                <div id="add-medication-form" style="display: none; margin-top: 20px;">
+                    <h3>Agregar Nuevo Medicamento</h3>
+                    <form id="medication-form">
+                        <div class="form-group">
+                            <label for="med-name">Nombre del Medicamento</label>
+                            <input type="text" id="med-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-dose">Dosis</label>
+                            <input type="text" id="med-dose" class="form-control" placeholder="Ej: 500mg" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-frequency">Frecuencia</label>
+                            <select id="med-frequency" class="form-control" required>
+                                <option value="">Selecciona frecuencia</option>
+                                <option value="daily">Diario</option>
+                                <option value="twice-daily">Dos veces al día</option>
+                                <option value="three-times">Tres veces al día</option>
+                                <option value="weekly">Semanal</option>
+                                <option value="as-needed">Según necesidad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="med-times">Horarios</label>
+                            <input type="text" id="med-times" class="form-control" placeholder="Ej: 8:00, 14:00, 20:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="med-notes">Notas Adicionales</label>
+                            <textarea id="med-notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn">Guardar Medicamento</button>
+                        <button type="button" class="btn btn-warning" id="cancel-medication">Cancelar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Historial -->
+            <section id="history" class="section">
+                <h2>Historial</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn" data-filter="all">Todos</button>
+                    <button class="btn" data-filter="crisis">Crisis</button>
+                    <button class="btn" data-filter="medication">Medicación</button>
+                    <button class="btn" data-filter="emergency">Emergencias</button>
+                </div>
+                
+                <div id="history-list">
+                    <!-- Los registros se cargarán dinámicamente aquí -->
+                </div>
+            </section>
+
+            <!-- Estadísticas -->
+            <section id="statistics" class="section">
+                <h2>Estadísticas</h2>
+                
+                <div class="quick-actions">
+                    <button class="btn" id="export-data">Exportar Datos</button>
+                </div>
+                
+                <h3>Frecuencia de Crisis</h3>
+                <div class="chart-container">
+                    <p>Gráfico de frecuencia de crisis - Datos de ejemplo</p>
+                </div>
+                
+                <h3>Cumplimiento de Medicación</h3>
+                <div class="chart-container">
+                    <p>Gráfico de cumplimiento de medicación - Datos de ejemplo</p>
+                </div>
+                
+                <h3>Generar Reportes</h3>
+                <div class="report-options">
+                    <div class="report-option" data-format="pdf">
+                        <i class="fas fa-file-pdf"></i>
+                        <h4>Reporte PDF</h4>
+                        <p>Generar reporte en formato PDF</p>
+                    </div>
+                    <div class="report-option" data-format="csv">
+                        <i class="fas fa-file-csv"></i>
+                        <h4>Reporte CSV</h4>
+                        <p>Generar reporte en formato CSV</p>
+                    </div>
+                    <div class="report-option" data-format="json">
+                        <i class="fas fa-file-code"></i>
+                        <h4>Reporte JSON</h4>
+                        <p>Generar reporte en formato JSON</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contactos -->
+            <section id="contacts" class="section">
+                <h2>Contactos</h2>
+                
+                <div class="contacts-grid">
+                    <div class="contact-card">
+                        <h3><i class="fas fa-user-md"></i> Contacto Médico</h3>
+                        <div class="contact-info">
+                            <p><strong>Nombre:</strong> Dr. Roberto Martínez</p>
+                            <p><strong>Especialidad:</strong> Neurólogo</p>
+                            <p><strong>Teléfono:</strong> +34 912 345 678</p>
+                            <p><strong>Email:</strong> r.martinez@hospital.es</p>
+                            <p><strong>Dirección:</strong> Calle Médica 123, Madrid</p>
+                        </div>
+                        <button class="btn">Editar Información</button>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3><i class="fas fa-phone-alt"></i> Contactos de Emergencia</h3>
+                        <div id="emergency-contacts-list">
+                            <!-- Los contactos de emergencia se cargarán dinámicamente aquí -->
+                        </div>
+                        <button class="btn" id="add-emergency-contact">Agregar Contacto</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Perfil -->
+            <section id="profile" class="section">
+                <h2>Perfil del Usuario</h2>
+                
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="user-name">Nombre Completo</label>
+                        <input type="text" id="user-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-email">Correo Electrónico</label>
+                        <input type="email" id="user-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-phone">Teléfono</label>
+                        <input type="tel" id="user-phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-birthdate">Fecha de Nacimiento</label>
+                        <input type="date" id="user-birthdate" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-condition">Tipo de Epilepsia</label>
+                        <input type="text" id="user-condition" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-allergies">Alergias</label>
+                        <textarea id="user-allergies" class="form-control" rows="3"></textarea>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn">Guardar Cambios</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <!-- Botón de emergencia flotante -->
+    <button class="emergency-btn small" id="emergency-button">
+        <div class="emergency-icon">🚨</div>
+        <span>EMERGENCIA</span>
+    </button>
+
+    <!-- Modal de confirmación de emergencia -->
+    <div class="modal" id="emergency-modal">
+        <div class="modal-content">
+            <h3>¿Activar Alerta de Emergencia?</h3>
+            <p>Se enviará tu ubicación actual a tus contactos de emergencia.</p>
+            <div class="modal-buttons">
+                <button class="btn" id="confirm-emergency">Sí, Activar</button>
+                <button class="btn btn-warning" id="cancel-emergency">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prompt de instalación PWA -->
+    <div class="install-prompt" id="installPrompt">
+        <p style="margin-bottom: 10px; color: #343a40;">¿Instalar EpilepsiApp?</p>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn" id="installConfirm" style="flex: 1;">Instalar</button>
+            <button class="btn btn-warning" id="installCancel" style="flex: 1;">Ahora no</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>EpilepsiApp &copy; 2023 - Diseñada para mejorar la calidad de vida de personas con epilepsia</p>
+        </div>
+    </footer>
+
+    <script>
+        // Datos de ejemplo para la aplicación
+        const sampleData = {
+            user: {
+                name: "María González",
+                email: "maria.gonzalez@ejemplo.com",
+                phone: "+34 612 345 678",
+                birthdate: "1985-05-15",
+                condition: "Epilepsia Focal",
+                allergies: "Ninguna conocida"
+            },
+            emergencyContacts: [
+                { name: "Juan González", phone: "+34 600 123 456", relationship: "Esposo" },
+                { name: "Ana Rodríguez", phone: "+34 611 222 333", relationship: "Hermana" }
+            ],
+            medications: [
+                { id: 1, name: "Levetiracetam", dose: "500mg", frequency: "twice-daily", times: "8:00, 20:00", notes: "Tomar con alimentos" },
+                { id: 2, name: "Lamotrigine", dose: "100mg", frequency: "daily", times: "22:00", notes: "" }
+            ],
+            history: [
+                { type: "crisis", date: "2023-10-15T14:30", description: "Crisis Focal - 5 minutos", details: "Síntomas: Mareo, visión borrosa" },
+                { type: "medication", date: "2023-10-15T08:00", description: "Levetiracetam 500mg", details: "Tomado" },
+                { type: "medication", date: "2023-10-14T20:00", description: "Levetiracetam 500mg", details: "Tomado" },
+                { type: "crisis", date: "2023-10-12T10:15", description: "Crisis Generalizada - 3 minutos", details: "Síntomas: Pérdida de conciencia, convulsiones" },
+                { type: "emergency", date: "2023-10-05T16:45", description: "Alerta de Emergencia Activada", details: "Ubicación enviada a contactos" }
+            ]
+        };
+
+        // Elementos DOM
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+        const dashboardCards = document.querySelectorAll('.dashboard-card');
+        const quickActionBtns = document.querySelectorAll('.quick-actions .btn');
+        const emergencyBtn = document.getElementById('emergency-button');
+        const dashboardEmergencyBtn = document.getElementById('dashboard-emergency');
+        const emergencyModal = document.getElementById('emergency-modal');
+        const confirmEmergency = document.getElementById('confirm-emergency');
+        const cancelEmergency = document.getElementById('cancel-emergency');
+        const addMedicationBtn = document.getElementById('add-medication-btn');
+        const addMedicationForm = document.getElementById('add-medication-form');
+        const cancelMedication = document.getElementById('cancel-medication');
+        const addEmergencyContactBtn = document.getElementById('add-emergency-contact');
+        const generateReportBtn = document.getElementById('generate-report');
+        const exportDataBtn = document.getElementById('export-data');
+        const historyFilters = document.querySelectorAll('#history .quick-actions .btn');
+        const reportOptions = document.querySelectorAll('.report-option');
+        const installPrompt = document.getElementById('installPrompt');
+        const installConfirm = document.getElementById('installConfirm');
+        const installCancel = document.getElementById('installCancel');
+        const offlineIndicator = document.getElementById('offlineIndicator');
+
+        // ===== PWA FUNCTIONALITY =====
+        
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registrado correctamente: ', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('Error al registrar ServiceWorker: ', error);
+                    });
+            });
+        }
+
+        // Detectar si la app está en modo standalone (instalada)
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+
+        // Manejar el prompt de instalación
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            setTimeout(() => {
+                if (!isRunningStandalone() && !localStorage.getItem('installDismissed')) {
+                    installPrompt.style.display = 'block';
+                }
+            }, 3000);
+        });
+
+        installConfirm.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('Usuario aceptó instalar la PWA');
+                    installPrompt.style.display = 'none';
+                }
+                
+                deferredPrompt = null;
+            }
+        });
+
+        installCancel.addEventListener('click', () => {
+            installPrompt.style.display = 'none';
+            localStorage.setItem('installDismissed', 'true');
+        });
+
+        // Detectar cambios en la conexión
+        window.addEventListener('online', () => {
+            offlineIndicator.style.display = 'none';
+            console.log('Conexión restaurada');
+        });
+
+        window.addEventListener('offline', () => {
+            offlineIndicator.style.display = 'block';
+            console.log('Sin conexión - Modo offline activado');
+        });
+
+        if (!navigator.onLine) {
+            offlineIndicator.style.display = 'block';
+        }
+
+        // ===== APP FUNCTIONALITY =====
+        
+        // Navegación entre secciones
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Cambiar tamaño del botón de emergencia según la sección
+            if (sectionId === 'dashboard') {
+                emergencyBtn.classList.remove('small');
+            } else {
+                emergencyBtn.classList.add('small');
+            }
+        }
+
+        // Event listeners para navegación
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+
+        dashboardCards.forEach(card => {
+            if (card.id !== 'dashboard-emergency') {
+                card.addEventListener('click', () => {
+                    const sectionId = card.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            }
+        });
+
+        quickActionBtns.forEach(btn => {
+            if (btn.hasAttribute('data-section')) {
+                btn.addEventListener('click', () => {
+                    const sectionId = btn.getAttribute('data-section');
+                    showSection(sectionId);
+                });
+            }
+        });
+
+        // Funcionalidad del botón de emergencia
+        function activateEmergency() {
+            emergencyModal.classList.add('active');
+        }
+
+        emergencyBtn.addEventListener('click', activateEmergency);
+        dashboardEmergencyBtn.addEventListener('click', activateEmergency);
+
+        confirmEmergency.addEventListener('click', () => {
+            // Simular envío de alerta de emergencia
+            alert('Alerta de emergencia enviada. Tu ubicación ha sido compartida con tus contactos.');
+            emergencyModal.classList.remove('active');
+            
+            // Registrar el evento en el historial
+            const now = new Date();
+            const emergencyEvent = {
+                type: "emergency",
+                date: now.toISOString(),
+                description: "Alerta de Emergencia Activada",
+                details: "Ubicación enviada a contactos"
+            };
+            
+            sampleData.history.unshift(emergencyEvent);
+            updateHistoryList();
+        });
+
+        cancelEmergency.addEventListener('click', () => {
+            emergencyModal.classList.remove('active');
+        });
+
+        // Gestión de medicación
+        addMedicationBtn.addEventListener('click', () => {
+            addMedicationForm.style.display = 'block';
+        });
+
+        cancelMedication.addEventListener('click', () => {
+            addMedicationForm.style.display = 'none';
+            document.getElementById('medication-form').reset();
+        });
+
+        document.getElementById('medication-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('med-name').value;
+            const dose = document.getElementById('med-dose').value;
+            const frequency = document.getElementById('med-frequency').value;
+            const times = document.getElementById('med-times').value;
+            const notes = document.getElementById('med-notes').value;
+            
+            // Crear nuevo medicamento
+            const newMedication = {
+                id: sampleData.medications.length + 1,
+                name,
+                dose,
+                frequency,
+                times,
+                notes
+            };
+            
+            sampleData.medications.push(newMedication);
+            updateMedicationList();
+            
+            // Ocultar formulario y resetear
+            addMedicationForm.style.display = 'none';
+            document.getElementById('medication-form').reset();
+            
+            alert('Medicamento agregado correctamente');
+        });
+
+        // Gestión de contactos de emergencia
+        addEmergencyContactBtn.addEventListener('click', () => {
+            const name = prompt("Nombre del contacto:");
+            const phone = prompt("Teléfono del contacto:");
+            const relationship = prompt("Relación:");
+            
+            if (name && phone) {
+                const newContact = {
+                    name,
+                    phone,
+                    relationship: relationship || "Contacto"
+                };
+                
+                sampleData.emergencyContacts.push(newContact);
+                updateEmergencyContacts();
+                alert('Contacto agregado correctamente');
+            }
+        });
+
+        // Generar reporte
+        generateReportBtn.addEventListener('click', () => {
+            alert('Reporte generado. Puedes descargarlo en formato PDF, CSV o JSON.');
+        });
+
+        // Exportar datos
+        exportDataBtn.addEventListener('click', () => {
+            alert('Datos exportados correctamente.');
+        });
+
+        // Generar reportes específicos
+        reportOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const format = option.getAttribute('data-format');
+                alert(`Generando reporte en formato ${format.toUpperCase()}. El archivo estará listo para descargar en unos segundos.`);
+            });
+        });
+
+        // Filtrar historial
+        historyFilters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                const filterType = filter.getAttribute('data-filter');
+                filterHistory(filterType);
+            });
+        });
+
+        // Funciones para actualizar la interfaz
+        function updateMedicationList() {
+            const medicationList = document.getElementById('medication-list');
+            medicationList.innerHTML = '';
+            
+            sampleData.medications.forEach(med => {
+                const medItem = document.createElement('div');
+                medItem.className = 'list-item';
+                medItem.innerHTML = `
+                    <div>
+                        <strong>${med.name}</strong> - ${med.dose}<br>
+                        <small>${getFrequencyText(med.frequency)} - ${med.times}</small>
+                        ${med.notes ? `<br><small>Notas: ${med.notes}</small>` : ''}
+                    </div>
+                    <div class="list-actions">
+                        <button class="mark-taken" data-id="${med.id}">✅</button>
+                        <button class="mark-omitted" data-id="${med.id}">❌</button>
+                        <button class="edit-med" data-id="${med.id}">✏️</button>
+                    </div>
+                `;
+                medicationList.appendChild(medItem);
+            });
+            
+            // Añadir event listeners para los botones de acción
+            document.querySelectorAll('.mark-taken').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const medId = parseInt(btn.getAttribute('data-id'));
+                    markMedicationAsTaken(medId);
+                });
+            });
+            
+            document.querySelectorAll('.mark-omitted').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const medId = parseInt(btn.getAttribute('data-id'));
+                    markMedicationAsOmitted(medId);
+                });
+            });
+        }
+
+        function getFrequencyText(frequency) {
+            const frequencies = {
+                'daily': 'Diario',
+                'twice-daily': 'Dos veces al día',
+                'three-times': 'Tres veces al día',
+                'weekly': 'Semanal',
+                'as-needed': 'Según necesidad'
+            };
+            return frequencies[frequency] || frequency;
+        }
+
+        function markMedicationAsTaken(medId) {
+            const med = sampleData.medications.find(m => m.id === medId);
+            if (med) {
+                const now = new Date();
+                const medEvent = {
+                    type: "medication",
+                    date: now.toISOString(),
+                    description: `${med.name} ${med.dose}`,
+                    details: "Tomado"
+                };
+                
+                sampleData.history.unshift(medEvent);
+                updateHistoryList();
+                alert(`${med.name} marcado como tomado`);
+            }
+        }
+
+        function markMedicationAsOmitted(medId) {
+            const med = sampleData.medications.find(m => m.id === medId);
+            if (med) {
+                const now = new Date();
+                const medEvent = {
+                    type: "medication",
+                    date: now.toISOString(),
+                    description: `${med.name} ${med.dose}`,
+                    details: "Omitido"
+                };
+                
+                sampleData.history.unshift(medEvent);
+                updateHistoryList();
+                alert(`${med.name} marcado como omitido`);
+            }
+        }
+
+        function updateHistoryList() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+            
+            sampleData.history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'list-item';
+                
+                let icon = '📅';
+                if (item.type === 'crisis') icon = '⚠️';
+                if (item.type === 'medication') icon = '💊';
+                if (item.type === 'emergency') icon = '🚨';
+                
+                const date = new Date(item.date);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                
+                historyItem.innerHTML = `
+                    <div>
+                        <span style="font-size: 1.2em; margin-right: 10px;">${icon}</span>
+                        <strong>${item.description}</strong><br>
+                        <small>${formattedDate}</small>
+                        ${item.details ? `<br><small>${item.details}</small>` : ''}
+                    </div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function filterHistory(filterType) {
+            const historyItems = document.querySelectorAll('#history-list .list-item');
+            
+            historyItems.forEach(item => {
+                const icon = item.querySelector('span').textContent;
+                let itemType = 'all';
+                
+                if (icon === '⚠️') itemType = 'crisis';
+                if (icon === '💊') itemType = 'medication';
+                if (icon === '🚨') itemType = 'emergency';
+                
+                if (filterType === 'all' || filterType === itemType) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function updateEmergencyContacts() {
+            const contactsContainer = document.getElementById('emergency-contacts-list');
+            contactsContainer.innerHTML = '';
+            
+            sampleData.emergencyContacts.forEach((contact, index) => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-info';
+                contactItem.innerHTML = `
+                    <p><strong>Nombre:</strong> ${contact.name}</p>
+                    <p><strong>Teléfono:</strong> ${contact.phone}</p>
+                    <p><strong>Relación:</strong> ${contact.relationship}</p>
+                    <button class="btn btn-warning" style="margin-top: 10px;" data-index="${index}">Eliminar</button>
+                `;
+                contactsContainer.appendChild(contactItem);
+            });
+            
+            // Añadir event listeners para eliminar contactos
+            document.querySelectorAll('#emergency-contacts-list .btn-warning').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    sampleData.emergencyContacts.splice(index, 1);
+                    updateEmergencyContacts();
+                });
+            });
+        }
+
+        function loadUserProfile() {
+            document.getElementById('user-name').value = sampleData.user.name;
+            document.getElementById('user-email').value = sampleData.user.email;
+            document.getElementById('user-phone').value = sampleData.user.phone;
+            document.getElementById('user-birthdate').value = sampleData.user.birthdate;
+            document.getElementById('user-condition').value = sampleData.user.condition;
+            document.getElementById('user-allergies').value = sampleData.user.allergies;
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMedicationList();
+            updateHistoryList();
+            updateEmergencyContacts();
+            loadUserProfile();
+        });
+
+        // Manejo del formulario de perfil
+        document.getElementById('profile-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Actualizar datos del usuario
+            sampleData.user.name = document.getElementById('user-name').value;
+            sampleData.user.email = document.getElementById('user-email').value;
+            sampleData.user.phone = document.getElementById('user-phone').value;
+            sampleData.user.birthdate = document.getElementById('user-birthdate').value;
+            sampleData.user.condition = document.getElementById('user-condition').value;
+            sampleData.user.allergies = document.getElementById('user-allergies').value;
+            
+            alert('Perfil actualizado correctamente');
+        });
+
+        // Manejo del formulario de crisis
+        document.getElementById('crisis-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const type = document.getElementById('crisis-type').value;
+            const duration = document.getElementById('crisis-duration').value;
+            const symptoms = document.getElementById('crisis-symptoms').value;
+            const triggers = document.getElementById('crisis-triggers').value;
+            const date = document.getElementById('crisis-date').value;
+            
+            const typeText = document.getElementById('crisis-type').options[document.getElementById('crisis-type').selectedIndex].text;
+            
+            const crisisEvent = {
+                type: "crisis",
+                date: date || new Date().toISOString(),
+                description: `${typeText} - ${duration} minutos`,
+                details: `Síntomas: ${symptoms}${triggers ? ` | Desencadenantes: ${triggers}` : ''}`
+            };
+            
+            sampleData.history.unshift(crisisEvent);
+            updateHistoryList();
+            
+            document.getElementById('crisis-form').reset();
+            alert('Crisis registrada correctamente');
+        });
+    </script>
+</body>
+</html>
